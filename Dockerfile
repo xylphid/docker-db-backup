@@ -7,12 +7,15 @@ LABEL maintainer.email="anthony@periquet.net"
 LABEL version=${VERSION}
 LABEL description="Database backup automation"
 
-ADD scripts/backup.job.sh /usr/local/bin
+ENV CRONFIG "0 23 * * *"
 
-RUN chmod +x /usr/local/bin/backup.job.sh && \
-    ln -s usr/local/bin/backup.job.sh /backup.job.sh # backwards compat
+#ADD scripts/backup.job.sh /usr/local/bin
+ADD scripts /opt/scripts/
+
+# RUN chmod +x /usr/local/bin/backup.job.sh && \
+#     ln -s usr/local/bin/backup.job.sh /backup.job.sh # backwards compat
 
 VOLUME /opt/backups/
 WORKDIR /opt/backups/
 
-ENTRYPOINT [ "backup.job.sh" ]
+ENTRYPOINT [ "/opt/scripts/configure.sh" ]
