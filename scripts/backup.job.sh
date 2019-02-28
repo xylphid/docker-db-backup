@@ -43,7 +43,7 @@ do
 
     backup="mkdir -p ${stack} && docker exec ${container} sh -c '${command}' > ${stack}/${today}.sql"
     echo -n "- [${dbType}] ${stack} : "
-    #eval ${backup}
+    eval ${backup}
     echo "done"
 done
 
