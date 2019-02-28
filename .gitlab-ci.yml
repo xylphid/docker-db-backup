@@ -1,0 +1,22 @@
+image: docker:stable
+
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  CI_REGISTRY_HOST: "registry.xylphid.net"
+  CI_BUILD_IMAGE: "db-backup"
+
+services:
+  - docker:dind
+
+stages:
+  - package
+
+docker-build:
+  stage: package
+  script:
+    - docker login -u gitlab -p ${CI_REGISTRY_TOKEN} ${CI_REGISTRY_HOST}
+    - docker build --build-arg VERSION=${CI_COMMIT_TAG} -t ${CI_REGISTRY_HOST}/${CI_BUILD_IMAGE}:${CI_COMMIT_TAG:-nightly} .
+    - docker push ${CI_REGISTRY_HOST}/${CI_BUILD_IMAGE}:${CI_COMMIT_TAG:-nightly}
+  tags:
+    - docker
