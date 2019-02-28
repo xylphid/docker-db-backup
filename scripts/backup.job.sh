@@ -15,7 +15,7 @@ done
 echo "========================="
 echo " Starting DB-Backup"
 echo " Initialized at ${today}"
-echo " Working directory : $(workdir)"
+echo " Working directory : ${workdir}"
 echo -e "=========================\n"
 
 cd /opt/backups/

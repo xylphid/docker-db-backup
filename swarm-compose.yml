@@ -1,0 +1,33 @@
+version: "3.4"
+
+networks:
+  swarm-net:
+    external: true
+
+volumes:
+  backup-repository:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: "addr=192.168.0.16,rw"
+      device: ":/c/backup/docker/"
+
+services:
+  cron:
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      update_config:
+        delay: 20s
+        failure_action: rollback
+        monitor: 30s
+        order: start-first
+    environment:
+      CRONFIG: "0 23 * * *"
+    image: registry.xylphid.net/db-backup:nightly
+    networks:
+      - swarm-net
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock
+      - backup-repository:/opt/backups/
