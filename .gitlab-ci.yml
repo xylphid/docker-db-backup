@@ -16,7 +16,7 @@ docker-build:
   stage: package
   script:
     - docker login -u gitlab -p ${CI_REGISTRY_TOKEN} ${CI_REGISTRY_HOST}
-    - docker build --build-arg VERSION=${CI_COMMIT_TAG} -t ${CI_REGISTRY_HOST}/${CI_BUILD_IMAGE}:${CI_COMMIT_TAG:-nightly} .
+    - docker build --build-arg VERSION=${CI_COMMIT_TAG:-nightly} -t ${CI_REGISTRY_HOST}/${CI_BUILD_IMAGE}:${CI_COMMIT_TAG:-nightly} .
     - docker push ${CI_REGISTRY_HOST}/${CI_BUILD_IMAGE}:${CI_COMMIT_TAG:-nightly}
   tags:
     - docker

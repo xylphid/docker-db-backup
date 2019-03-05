@@ -51,22 +51,3 @@ echo
 echo -e "! Backup terminated\n\n"
 
 exit 0
-
-# docker ps \
-#     --format '{{.Names}}\t{{.Image}}' \
-#     --filter "name=database" \
-#     --filter "name=psql" \
-# | awk '{
-#     # Prepare backup command according to the current engine
-#     if ($2 ~ /mysql/) command="mysqldump -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE}";
-#     else if ($2 ~ /postgres/) command="pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB}";
-
-#     "date +%F" | getline today
-#     # Get the stack name
-#     inspect="docker inspect --format '\''{{index .Config.Labels \"com.docker.stack.namespace\"}}'\'' " $1;
-#     inspect | getline stack
-    
-#     backup="docker exec " $1 " sh -c '\''" command "'\'' > " stack "/" today ".sql";
-#     print $1 " sh -c '\''" command "'\'' > " stack "/" today ".sql";
-# }' \
-# | xargs --no-run-if-empty docker exec
