@@ -42,8 +42,10 @@ do
     esac
 
     backup="mkdir -p ${stack} && docker exec ${container} sh -c '${command}' > ${stack}/${today}.sql"
+    clean="ls -r ${stack} | tail -n +7 | grep -v '01.sql' | xargs --no-run-if-empty rm "
     echo -n "- [${dbType}] ${stack} : "
     eval ${backup}
+    eval ${clean}
     echo "done"
 done
 
