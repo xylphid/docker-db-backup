@@ -26,7 +26,6 @@ for database in $databases
 do
     container=$(echo $database | cut -d: -f1)
     dbType=$(echo $database | cut -d: -f2)
-    #stack=$(echo $container | cut -d. -f1 | cut -d_ -f1)
     project=$(docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' ${container})
     namespace=$(docker inspect --format '{{index .Config.Labels "com.docker.stack.namespace"}}' ${container})
     stack=${project:-${namespace}}
@@ -42,7 +41,7 @@ do
     esac
 
     backup="mkdir -p ${stack} && docker exec ${container} sh -c '${command}' > ${stack}/${today}.sql"
-    clean="ls -r ${stack} | tail -n +7 | grep -v '01.sql' | xargs --no-run-if-empty rm "
+    clean="ls -r ${stack} | tail -n +14 | grep -v '01.sql' | xargs --no-run-if-empty rm "
     echo -n "- [${dbType}] ${stack} : "
     eval ${backup}
     eval ${clean}
