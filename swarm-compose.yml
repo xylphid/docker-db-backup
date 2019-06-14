@@ -25,7 +25,7 @@ services:
         order: start-first
     environment:
       CRONFIG: "0 23 * * *"
-    image: registry.xylphid.net/db-backup:nightly
+    image: registry.xylphid.net/docker/backup:nightly
     networks:
       - swarm-net
     volumes:

@@ -4,7 +4,7 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   CI_REGISTRY_HOST: "registry.xylphid.net"
-  CI_BUILD_IMAGE: "db-backup"
+  CI_BUILD_IMAGE: "docker/backup"
 
 services:
   - docker:dind
