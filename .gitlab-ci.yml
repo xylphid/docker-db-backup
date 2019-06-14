@@ -20,3 +20,4 @@ docker-build:
     - docker push ${CI_REGISTRY_HOST}/${CI_BUILD_IMAGE}:${CI_COMMIT_TAG:-nightly}
   tags:
     - docker
+    - x86
