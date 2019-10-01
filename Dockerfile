@@ -1,4 +1,4 @@
-from docker:18.09.2
+from docker:19.03.2
 
 ARG VERSION
 ENV VERSION ${VERSION:-"nightly"}

@@ -31,6 +31,9 @@ do
     stack=${project:-${namespace}}
 
     case $dbType in
+        mongo)
+            command='mongodump --archive';
+            ;;
         mysql)
             command='mysqldump -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE}'
             ;;
