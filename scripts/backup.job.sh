@@ -34,7 +34,7 @@ do
         mongo)
             command='mongodump --archive';
             ;;
-        mysql)
+        mysql | mariadb)
             command='mysqldump -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE}'
             ;;
         postgres)

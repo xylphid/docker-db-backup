@@ -4,6 +4,7 @@ Backup is a simple lightweight tool to backup your databases.\
 It parse any of your running container to find databases, coneects to each one of them and execute a simple backup using native provided tools.\
 Supported databases :
 - MySQL
+- MariaDB
 - MongoDB
 - PostgreSQL
 
