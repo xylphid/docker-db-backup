@@ -89,8 +89,11 @@ do
         *)  continue;;
     esac
 
-    backup="mkdir -p ${stack} && docker exec ${container} sh -c '${command}' > ${stack}/${today}.sql"
-    clean="ls -r ${stack} | tail -n +14 | grep -v '01.sql' | sed -e 's/^/${stack}\//' | xargs --no-run-if-empty rm "
+    backup="mkdir -p ${stack} \
+        && docker exec ${container} sh -c '${command}' > ${stack}/${today}.raw \
+        && tar cfz ${stack}/${today}.tar.gz ${stack}/${today}.raw \
+        && rm ${stack}/${today}.raw"
+    clean="ls -r ${stack} | tail -n +14 | grep -v '01.tar.gz' | sed -e 's/^/${stack}\//' | xargs --no-run-if-empty rm "
     echo -n "- [${dbType}] ${stack} : "
     eval ${backup}
     eval ${clean}
