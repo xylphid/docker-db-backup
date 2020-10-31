@@ -1,16 +1,62 @@
 #!/bin/sh
 
+# Get container env
+#   get_env "ENV_NAME"
+get_env() {
+    echo $(docker exec ${container} env | grep $1 | cut -d'=' -f2)
+}
+
+# Build mysql backup command
+get_mysql_command() {
+    MYSQL_RANDOM_ROOT_PASSWORD=$(get_env "MYSQL_RANDOM_ROOT_PASSWORD")
+    if [[ "${MYSQL_RANDOM_ROOT_PASSWORD}" != "yes" ]]; then
+        user='root'
+        password=$(get_env "MYSQL_ROOT_PASSWORD_FILE")
+        if [[ "${password}" != "" ]]; then
+            password="\$(cat ${password})"
+        else
+            password=$(get_env "MYSQL_ROOT_PASSWORD")
+        fi
+    else
+        user=$(get_env "MYSQL_USER")
+        password=$(get_env "MYSQL_PASSWORD")
+    fi
+
+    database=$(get_env "MYSQL_DATABASE")
+    if [[ "${database}" == "" ]]; then
+        database="--all-databases"
+    fi
+
+    echo "export MYSQL_PWD=${password}; mysqldump --max-allowed-packet=512M -u ${user} ${database}"
+}
+
+# Build postgresql backup command
+get_psql_command() {
+    user=$(get_env "POSTGRES_USER")
+    if [[ "${user}" == "" ]]; then
+        user="postgres"
+    fi
+
+    database=$(get_env "POSTGRES_DB")
+    if [[ "${database}" == "" ]]; then
+        echo "pg_dumpall -U ${user}"
+    else
+        echo "pg_dump -U ${user} ${database}"
+    fi
+}
+
 today=$(date +%F)
 workdir="/opt/backups/"
 filter=""
 
-while getopts p: param
+while getopts f: param
 do
     case $param in
-        p)      filter="${filter} --filter 'name=${OPTARG}'";;
-        [?])    print >2 "Usage: $0 [-p database-pattern]...";;
+        f)      filter="${filter}|${OPTARG}'";;
+        [?])    print >2 "Usage: $0 [-f image-pattern]...";;
     esac
 done
+filter=$(echo "${filter}" | sed "s/^|//")
 
 echo "========================="
 echo " Starting DB-Backup"
@@ -19,7 +65,7 @@ echo " Working directory : ${workdir}"
 echo -e "=========================\n"
 
 cd /opt/backups/
-filterCommand="docker ps --format '{{.Names}}:{{.Image}}' ${filter:-"--filter 'name=database'"}"
+filterCommand="docker ps --format '{{.Names}}:{{.Image}}' | awk '/${filter:-"mariadb|mongo|mysql|postgres"}/{print \$1}'"
 databases=$(eval $filterCommand)
 
 for database in $databases
@@ -32,13 +78,13 @@ do
 
     case $dbType in
         mongo)
-            command='mongodump --archive';
+            command='mongodump --quiet --archive';
             ;;
         mysql | mariadb)
-            command='mysqldump -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE}'
+            command=$(get_mysql_command)
             ;;
         postgres)
-            command='pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB}';
+            command=$(get_psql_command)
             ;;
         *)  continue;;
     esac
